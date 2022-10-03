@@ -9,8 +9,30 @@ class BankAccount {
     }
 
     balance() {
-        // returns balance of account - must create transaction class first      
-    }
+      let sum = 0;
+      for (let i = 0; i < this.transactions.length; i++) {
+        sum += this.transactions[i].amount
+      }   
+      return sum
+      };
+
+    charge(payee, amt){
+      let currentBalance =this.balance();
+      if(amt >= currentBalance) {
+      let chargeTransaction = new Transaction(-1*amt, payee);
+      this.transactions.push(chargeTransaction);
+      }
+      else {
+        //do nothing
+      }
+    };
+
+    deposit(amt){
+      if(amt>0){
+      let depositTransaction = new Transaction(amt, this.owner);
+      this.transactions.push(depositTransaction);
+      }
+    };
 }
 
 
@@ -35,32 +57,70 @@ if (typeof describe === 'function'){
         assert.equal(acct1.owner, 'James Doe');
         assert.equal(acct1.accountNumber, 'xx4432');
         assert.equal(acct1.transactions.length, 0);
+        assert.equal(acct1.balance(), 0);
+
       });
     });
-  
-    describe('Ship', function(){
-      it('should have a name, a type, an ability and an empty crew upon instantiation', function(){
-        let mav = new Ship('Mars Ascent Vehicle', 'MAV', 'Ascend into low orbit');
-        assert.equal(mav.name, 'Mars Ascent Vehicle');
-        assert.equal(mav.type, 'MAV');
-        assert.equal(mav.ability, 'Ascend into low orbit');
-        assert.equal(mav.crew.length, 0);
+
+    describe('#testing account balance', function(){
+      it('should add account balance', function(){
+        
+        const acct1 = new BankAccount('xx4432', 'James Doe');
+        assert.equal(acct1.balance(), 0);
+        acct1.deposit(100);
+        assert.equal(acct1.balance(),100);
+        acct1.charge(10, "Target");
+        assert.equal(acct1.balance(), 90);
+
+
       });
-  
-      it('can return a mission statement correctly', function(){
-        let mav = new Ship('Mars Ascent Vehicle', 'MAV', 'Ascend into low orbit');
-        const crewMember1 = new CrewMember('Rick Martinez', 'pilot', 'chemistry');
-        let hermes = new Ship('Hermes', 'Main Ship', 'Interplanetary Space Travel');
-        const crewMember2 = new CrewMember('Commander Lewis', 'commander', 'geology');
-        assert.equal(mav.missionStatement(), "Can't perform a mission yet.");
-        assert.equal(hermes.missionStatement(), "Can't perform a mission yet.");
-  
-        crewMember1.enterShip(mav);
-        assert.equal(mav.missionStatement(), "Ascend into low orbit");
-  
-        crewMember2.enterShip(hermes);
-        assert.equal(hermes.missionStatement(), "Interplanetary Space Travel");
+      it('should not allow a negative deposit', function(){
+        
+        const acct1 = new BankAccount('xx4432', 'James Doe');
+        assert.equal(acct1.balance(), 0);
+        acct1.deposit(100);
+        assert.equal(acct1.balance(),100);
+        acct1.deposit(-30);
+        assert.equal(acct1.balance(), 100);
+
+      });
+
+      it('should not allow charging to overdraft', function(){
+        
+        const acct1 = new BankAccount('xx4432', 'James Doe');
+        assert.equal(acct1.balance(), 0);
+        acct1.charge('target', 30);
+        assert.equal(acct1.balance(),0);
+    
+      });
+
+      it('should allow a refund', function(){
+        
+        const acct1 = new BankAccount('xx4432', 'James Doe');
+        assert.equal(acct1.balance(), 0);
+        acct1.charge('target', -30);
+        assert.equal(acct1.balance(),30);
+    
       });
     });
-  }
+
+    describe('#testing transaction creation', function(){
+      it('should create a transaction correctly', function(){
+        let transaction1 = new Transaction(30, 'Deposit' );
+        assert.equal(transaction1.amount, 30);
+        assert.equal(transaction1.payee, 'Deposit');
+        assert.notEqual(transaction1.date, undefined);
+        assert.notEqual(transaction1.date, null);
+      });
   
+      it('should create a transaction correctly for a charge', function(){
+        let transaction1 = new Transaction(-34, 'Target');
+            assert.equal(transaction1.amount, -34);
+        assert.equal(transaction1.payee, "Target");
+        assert.notEqual(transaction1.date, undefined);
+        assert.notEqual(transaction1.date, null);
+  
+
+    });
+  });
+};
