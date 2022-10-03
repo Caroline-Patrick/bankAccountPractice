@@ -44,6 +44,19 @@ class Transaction {
   }
 }
 
+class SavingsAccount extends BankAccount {
+  constructor(accountNumber, owner, interestRate){
+    super(accountNumber, owner);
+    this.interestRate = interestRate;
+  }
+  accrueInterest(){
+    let currentBalance = this.balance();
+    let interestAmt = currentBalance * this.interestRate;
+    let interestTransaction = new Transaction(interestAmt, "Interest");
+    this.transactions.push(interestTransaction);
+  }
+}
+
 
 
 
@@ -123,4 +136,24 @@ if (typeof describe === 'function'){
 
     });
   });
+  describe('Savings Account Creation', function(){
+    it('create account correctly', function(){
+      let saving = new SavingsAccount("xxx1234", 'Maddie Mortis', .10 );
+      assert.equal("xxx1234", saving.accountNumber);
+      assert.equal("Maddie Mortis", saving.owner);
+      assert.equal(.10, saving.interestRate);
+      assert.equal(0, saving.balance());
+    });
+
+    it('Accrue interest correctly', function(){
+      let saving = new SavingsAccount("xxx1234", 'Maddie Mortis', .10 );
+      assert.equal("xxx1234", saving.accountNumber);
+      assert.equal("Maddie Mortis", saving.owner);
+      assert.equal(.10, saving.interestRate);
+      assert.equal(0, saving.balance());
+      saving.deposit(100);
+      saving.accrueInterest();
+      assert.equal(110, saving.balance());
+    });
+}); 
 };
