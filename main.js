@@ -10,6 +10,7 @@ class BankAccount {
 
     balance() {
       let sum = 0;
+      
       for (let i = 0; i < this.transactions.length; i++) {
         sum += this.transactions[i].amount
       }   
@@ -18,23 +19,29 @@ class BankAccount {
 
     charge(payee, amt){
       let currentBalance =this.balance();
-      if(amt >= currentBalance) {
+      console.log("CheckOne: " + currentBalance)
+      if(amt <= currentBalance) {
+      
+        
       let chargeTransaction = new Transaction(-1*amt, payee);
       this.transactions.push(chargeTransaction);
       }
+
       else {
+        console.log('it was an else')
         //do nothing
       }
     };
 
     deposit(amt){
       if(amt>0){
-      let depositTransaction = new Transaction(amt, this.owner);
+      let depositTransaction = new Transaction(amt, 'Deposit');
       this.transactions.push(depositTransaction);
       }
     };
 }
 
+// let accountTwo = new BankAccount("xxx123")
 
 class Transaction {
   constructor(amount, payee) {
@@ -79,11 +86,15 @@ if (typeof describe === 'function'){
       it('should add account balance', function(){
         
         const acct1 = new BankAccount('xx4432', 'James Doe');
+          console.log(acct1.balance());
         assert.equal(acct1.balance(), 0);
         acct1.deposit(100);
+           console.log(acct1.balance());
         assert.equal(acct1.balance(),100);
-        acct1.charge(10, "Target");
+
+        acct1.charge("Target", 10);
         assert.equal(acct1.balance(), 90);
+          console.log(acct1.balance());
 
 
       });
